@@ -518,9 +518,9 @@ class Parser:
         modifiers = self.parse_modifiers()
 
         if self._try_accept("val"):
-            mutability = "val"
+            mutability = node.Mutability.VAL
         elif self._try_accept("var"):
-            mutability = "var"
+            mutability = node.Mutability.VAR
         else:
             mutability = None
 
@@ -1133,7 +1133,7 @@ class Parser:
         return node.PropertyDeclaration(
             position=token.position,
             modifiers=modifiers,
-            mutability=token.value,
+            mutability=node.Mutability(token.value),
             generics=generics,
             receiver=receiver,
             declaration=declaration,
@@ -1398,7 +1398,7 @@ class Parser:
 
         return node.ConstructorDelegationCall(
             position=token.position,
-            delegate=token.value,
+            delegate=node.ConstructorDelegate(token.value),
             arguments=arguments,
         )
 

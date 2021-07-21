@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from textwrap import indent as _indent
 from typing import (
     Generic,
-    Literal,
     Optional,
     TypeVar,
     Union,
@@ -333,10 +333,18 @@ class ClassBody(Node):
         return f"{{\n{members}\n}}"
 
 
+class Mutability(str, Enum):
+    VAL = "val"
+    VAR = "var"
+
+    def __str__(self) -> str:
+        return self.value
+
+
 @dataclass
 class ClassParameter(Node):
     modifiers: Modifiers
-    mutability: Optional[Literal["val", "var"]]
+    mutability: Optional[Mutability]
     name: str
     type: Type
     default: Optional[Expression]
@@ -349,8 +357,8 @@ class ClassParameter(Node):
         else:
             modifiers = ""
 
-        if self.mutability:
-            mutability = f"{self.mutability} "
+        if self.mutability is not None:
+            mutability = f"{self.mutability!s} "
         else:
             mutability = ""
 
@@ -640,7 +648,7 @@ class MultiVariableDeclaration(Nodes[VariableDeclaration]):
 @dataclass
 class PropertyDeclaration(Declaration):
     modifiers: Modifiers
-    mutability: Literal["val", "var"]
+    mutability: Mutability
     generics: TypeParameters
     receiver: Optional[ReceiverType]
     declaration: Union[VariableDeclaration, MultiVariableDeclaration]
@@ -704,7 +712,7 @@ class PropertyDeclaration(Declaration):
         else:
             setter = ""
 
-        return (f"{modifiers}{self.mutability} {generics}{receiver}"
+        return (f"{modifiers}{self.mutability!s} {generics}{receiver}"
                 f"{self.declaration!s}{constraints}{value}{getter}{setter}")
 
 
@@ -892,15 +900,23 @@ class SecondaryConstructor(Node):
         return f"{modifiers}constructor{self.parameters!s}{delegation}{body}"
 
 
+class ConstructorDelegate(str, Enum):
+    THIS = "this"
+    SUPER = "super"
+
+    def __str__(self) -> str:
+        return self.value
+
+
 @dataclass
 class ConstructorDelegationCall(Node):
-    delegate: Literal["this", "super"]
+    delegate: ConstructorDelegate
     arguments: ValueArguments
 
     __slots__ = ("delegate", "arguments")
 
     def __str__(self) -> str:
-        return f"{self.delegate}{self.arguments}"
+        return f"{self.delegate!s}{self.arguments}"
 
 
 @dataclass
@@ -970,7 +986,7 @@ class Type(Node):
 
 @dataclass
 class TypeReference(Node):
-    subtype: Union[UserType, Literal["dynamic"]]
+    subtype: Union[UserType, str]
 
     __slots__ = ("subtype", )
 
