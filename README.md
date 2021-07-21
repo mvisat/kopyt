@@ -9,10 +9,10 @@ pip install -U kopyt
 
 ## Features
 - Supports Kotlin 1.5
-- Zero dependency (for Python 3.7+)
+- Zero dependency
 
 ## Requirements
-- Python 3.6+
+- Python 3.7+
 
 ## Usage
 ```python
